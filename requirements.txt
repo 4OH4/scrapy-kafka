@@ -1,2 +1,2 @@
 Scrapy >= 1.4
-kafka-python >= 1.4.2
+kafka-python >= 1.3
