@@ -1,2 +1,2 @@
-Scrapy >= 0.24.2
-kafka-python >= 0.9.1
+Scrapy >= 1.4
+kafka-python >= 1.4.2
