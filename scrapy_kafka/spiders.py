@@ -58,12 +58,13 @@ class KafkaSpiderMixin(object):
 
         :rtype: str or None
         """
-        NotImplemented
+        raise NotImplementedError
 
     def schedule_next_request(self):
         """Schedules a request if available"""
         try:
-            message = self.consumer.next()
+            message = next(self.consumer)
+
             url, html_body = self.process_kafka_message(message)
             if html_body:
                 self.parse(HtmlResponse(url=url, body=html_body))
