@@ -45,7 +45,9 @@ class KafkaSpiderMixin(object):
         # wait at most 1sec for more messages. Otherwise continue
         self.consumer = KafkaConsumer(self.topic, group_id=consumer_group,
                                       bootstrap_servers=hosts, auto_offset_reset='earliest',
-                                      enable_auto_commit=False, iter_timeout=1.0, **configs)
+                                      enable_auto_commit=False, consumer_timeout_ms=100,
+                                      request_timeout_ms=190000, session_timeout_ms=180000, **configs)
+
         # idle signal is called when the spider has no requests left,
         # that's when we will schedule new requests from kafka topic
         self.crawler.signals.connect(self.spider_idle, signal=signals.spider_idle)
