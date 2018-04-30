@@ -103,4 +103,4 @@ class ListeningKafkaSpider(KafkaSpiderMixin, Spider):
         :type crawler: scrapy.crawler.Crawler
         """
         super(ListeningKafkaSpider, self)._set_crawler(crawler)
-        self.setup_kafka(crawler.settings)
+        self.setup_kafka(crawler.settings, **self.configs if hasattr(self, "configs") else {})
