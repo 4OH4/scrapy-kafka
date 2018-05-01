@@ -13,7 +13,7 @@ class KafkaSpiderMixin(object):
 
     :type kafka_topic: str
     """
-    kafka_topic = None
+    topic = None
 
     def process_kafka_message(self, message):
         """"
@@ -52,7 +52,7 @@ class KafkaSpiderMixin(object):
         # that's when we will schedule new requests from kafka topic
         self.crawler.signals.connect(self.spider_idle, signal=signals.spider_idle)
         self.crawler.signals.connect(self.item_scraped, signal=signals.item_scraped)
-        self.log("Reading messages from kafka topic '%s'" % self.kafka_topic)
+        self.log("Reading messages from kafka topic '%s'" % self.topic)
 
     def next_request(self):
         """
