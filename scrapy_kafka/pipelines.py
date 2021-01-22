@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from scrapy.utils.serialize import ScrapyJSONEncoder
 
-from kafka.client import KafkaClient
-from kafka.producer import SimpleProducer
+from kafka import KafkaProducer
 
 
 class KafkaPipeline(object):
@@ -42,7 +41,7 @@ class KafkaPipeline(object):
         item = dict(item)
         item['spider'] = spider.name
         msg = self.encoder.encode(item)
-        self.producer.send_messages(self.topic, msg)
+        self.producer.send(self.topic, value=bytes(msg, encoding='utf-8'))
 
     @classmethod
     def from_settings(cls, settings):
@@ -54,6 +53,5 @@ class KafkaPipeline(object):
         """
         k_hosts = settings.get('SCRAPY_KAFKA_HOSTS', ['localhost:9092'])
         topic = settings.get('SCRAPY_KAFKA_ITEM_PIPELINE_TOPIC', 'scrapy_kafka_item')
-        kafka = KafkaClient(k_hosts)
-        conn = SimpleProducer(kafka)
+        conn = KafkaProducer(bootstrap_servers=k_hosts)
         return cls(conn, topic)

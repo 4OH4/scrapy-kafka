@@ -2,8 +2,7 @@
 from scrapy import signals
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spiders import Spider
-from scrapy.http import HtmlResponse
-from kafka.consumer import KafkaConsumer
+from kafka import KafkaConsumer
 
 
 class KafkaSpiderMixin(object):
@@ -26,7 +25,7 @@ class KafkaSpiderMixin(object):
         if not message:
             return None
 
-        return message.message.value
+        return message.value.decode()
 
     def setup_kafka(self, settings, **configs):
         """Setup redis connection and idle signal.
@@ -56,19 +55,20 @@ class KafkaSpiderMixin(object):
     def next_request(self):
         """
         Returns a request to be scheduled.
-
         :rtype: str or None
         """
-        raise NotImplementedError
+        message = next(self.consumer)
+        url = self.process_kafka_message(message)
+        if not url:
+            return None
+        return self.make_requests_from_url(url)
 
     def schedule_next_request(self):
         """Schedules a request if available"""
         try:
-            message = next(self.consumer)
-
-            url, html_body = self.process_kafka_message(message)
-            if html_body:
-                self.parse(HtmlResponse(url=url, body=html_body))
+            req = self.next_request()
+            if req:
+                self.crawler.engine.crawl(req, spider=self)
         except StopIteration:
             self.log("No messages in kafka")
 
